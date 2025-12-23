@@ -1,0 +1,16 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Regra Global: Apenas o dono dos dados pode ler ou escrever em sua própria coleção
+    // O {userId} no caminho DEVE ser igual ao uid do usuário logado.
+    match /users/{userId}/{document=**} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+    
+    // Bloqueia acesso a qualquer outra coleção ou documento raiz não especificado acima
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
